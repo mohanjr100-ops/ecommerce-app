@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Relative base for GitHub Pages and production hosting
+  base: '/ecommerce-app/', // Explicit repo base for GitHub Pages
   server: {
     port: 5173,
     proxy: {
