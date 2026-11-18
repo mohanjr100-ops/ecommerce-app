@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { DollarSign, ShoppingBag, PackageCheck, Users, ArrowUpRight, TrendingUp } from 'lucide-react';
+import { fallbackProducts } from '../../data/fallbackProducts';
 
 const AdminDashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -17,7 +17,49 @@ const AdminDashboardPage = () => {
         setStats(res.data.stats);
         setRecentOrders(res.data.recentOrders || []);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load admin metrics');
+        // Fallback for GitHub Pages static showcase
+        const localOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+        const storedProducts = localStorage.getItem('catalog_products');
+        const catalog = storedProducts ? JSON.parse(storedProducts) : fallbackProducts;
+        const registeredUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+
+        const totalRevenue = localOrders.reduce((acc, o) => acc + (o.totalPrice || 0), 0);
+
+        setStats({
+          totalRevenue: totalRevenue || 148884,
+          totalOrders: localOrders.length || 3,
+          totalProducts: catalog.length || 10,
+          totalUsers: (registeredUsers.length || 0) + 2,
+        });
+
+        // Mock recent orders if none placed yet
+        if (localOrders.length > 0) {
+          setRecentOrders(localOrders.slice(0, 5));
+        } else {
+          setRecentOrders([
+            {
+              _id: '6afd50ed05375639446a3922',
+              user: { name: 'Demo Customer', email: 'user@example.com' },
+              totalPrice: 24990,
+              status: 'Delivered',
+              createdAt: new Date(Date.now() - 86400000).toISOString(),
+            },
+            {
+              _id: '6afd983b10294821034f112a',
+              user: { name: 'Rahul Sharma', email: 'rahul@example.com' },
+              totalPrice: 114900,
+              status: 'Shipped',
+              createdAt: new Date(Date.now() - 36000000).toISOString(),
+            },
+            {
+              _id: '6afd0018fbc71144a991820b',
+              user: { name: 'Priya Patel', email: 'priya@example.com' },
+              totalPrice: 8994,
+              status: 'Pending',
+              createdAt: new Date().toISOString(),
+            },
+          ]);
+        }
       } finally {
         setLoading(false);
       }
@@ -29,14 +71,6 @@ const AdminDashboardPage = () => {
     return (
       <div className="py-20 flex justify-center">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="p-6 bg-red-50 text-red-700 rounded-2xl">{error}</div>
       </div>
     );
   }
@@ -100,7 +134,7 @@ const AdminDashboardPage = () => {
               {stats?.totalOrders || 0}
             </span>
             <span className="text-xs text-indigo-600 font-semibold flex items-center gap-0.5 mt-2">
-              All time purchases
+              All-time orders
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -112,21 +146,21 @@ const AdminDashboardPage = () => {
         <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
-              Live Products
+              Active Products
             </span>
             <span className="text-2xl font-extrabold text-gray-900 mt-1 block">
               {stats?.totalProducts || 0}
             </span>
-            <span className="text-xs text-gray-500 font-semibold flex items-center gap-0.5 mt-2">
-              Active inventory
+            <span className="text-xs text-blue-600 font-semibold flex items-center gap-0.5 mt-2">
+              In stock & active
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
             <ShoppingBag className="w-6 h-6" />
           </div>
         </div>
 
-        {/* Total Registered Users */}
+        {/* Registered Users */}
         <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
@@ -135,11 +169,11 @@ const AdminDashboardPage = () => {
             <span className="text-2xl font-extrabold text-gray-900 mt-1 block">
               {stats?.totalUsers || 0}
             </span>
-            <span className="text-xs text-blue-600 font-semibold flex items-center gap-0.5 mt-2">
-              Registered accounts
+            <span className="text-xs text-purple-600 font-semibold flex items-center gap-0.5 mt-2">
+              Verified accounts
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
             <Users className="w-6 h-6" />
           </div>
         </div>
@@ -150,65 +184,70 @@ const AdminDashboardPage = () => {
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Recent Customer Orders</h2>
-            <p className="text-xs text-gray-500">Latest transactions placed in the store</p>
+            <p className="text-xs text-gray-500">Live stream of store transactions</p>
           </div>
           <Link
             to="/admin/orders"
             className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
           >
-            View All Orders <ArrowUpRight className="w-4 h-4" />
+            View All Orders <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-400 tracking-wider">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">
               <tr>
                 <th className="px-6 py-4">Order ID</th>
                 <th className="px-6 py-4">Customer</th>
-                <th className="px-6 py-4">Items</th>
-                <th className="px-6 py-4">Total</th>
-                <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4">Total Amount</th>
+                <th className="px-6 py-4">Fulfillment Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {recentOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-400">
-                    No orders have been placed yet.
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500 text-xs">
+                    No orders have been recorded yet.
                   </td>
                 </tr>
               ) : (
                 recentOrders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-50/50 transition">
-                    <td className="px-6 py-4 font-mono text-xs font-semibold text-gray-800">
-                      #{order._id.slice(-6)}
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900">
-                      {order.user?.name || order.shippingAddress.fullName}
+                  <tr key={order._id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-mono text-xs text-gray-600 font-bold">
+                      #{order._id.slice(-8)}
                     </td>
                     <td className="px-6 py-4">
-                      {order.orderItems.length} {order.orderItems.length === 1 ? 'item' : 'items'}
+                      <div className="font-semibold text-gray-900">
+                        {order.user?.name || order.shippingAddress?.fullName || 'Customer'}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {order.user?.email || 'Direct checkout'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-gray-500">
+                      {new Date(order.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                     </td>
                     <td className="px-6 py-4 font-bold text-gray-900">
                       ₹{order.totalPrice.toLocaleString('en-IN')}
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                        className={`text-xs font-bold px-3 py-1 rounded-full border ${
                           order.status === 'Delivered'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : order.status === 'Shipped'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-amber-100 text-amber-800'
+                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
                         }`}
                       >
                         {order.status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-gray-400">
-                      {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
                 ))

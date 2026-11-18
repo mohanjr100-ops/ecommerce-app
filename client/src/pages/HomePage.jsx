@@ -6,14 +6,22 @@ import { Search, SlidersHorizontal, Sparkles } from 'lucide-react';
 import { fallbackProducts } from '../data/fallbackProducts';
 
 const HomePage = () => {
-  const [products, setProducts] = useState(fallbackProducts);
+  const getInitialProducts = () => {
+    try {
+      const stored = localStorage.getItem('catalog_products');
+      return stored ? JSON.parse(stored) : fallbackProducts;
+    } catch {
+      return fallbackProducts;
+    }
+  };
+
+  const [products, setProducts] = useState(getInitialProducts);
   const [categories, setCategories] = useState(['All', 'Audio', 'Computers', 'Accessories', 'Displays', 'Wearables', 'Cameras', 'Electronics']);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   // Fetch categories once on mount
   useEffect(() => {
@@ -24,7 +32,10 @@ const HomePage = () => {
           setCategories(res.data.categories);
         }
       } catch (err) {
-        // Keep fallback categories
+        // Fallback: derive categories from local catalog
+        const catalog = getInitialProducts();
+        const cats = ['All', ...new Set(catalog.map((p) => p.category))];
+        setCategories(cats);
       }
     };
     fetchCategories();
@@ -34,7 +45,6 @@ const HomePage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      setError(null);
       try {
         const params = {
           page: currentPage,
@@ -54,11 +64,12 @@ const HomePage = () => {
         } else if (searchQuery.trim() || (selectedCategory && selectedCategory !== 'All')) {
           setProducts([]);
         } else {
-          setProducts(fallbackProducts);
+          setProducts(getInitialProducts());
         }
       } catch (err) {
         // Fallback for GitHub Pages static showcase mode
-        let filtered = fallbackProducts;
+        const catalog = getInitialProducts();
+        let filtered = catalog;
         if (selectedCategory && selectedCategory !== 'All') {
           filtered = filtered.filter((p) => p.category === selectedCategory);
         }

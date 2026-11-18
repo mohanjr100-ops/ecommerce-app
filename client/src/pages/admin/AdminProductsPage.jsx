@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { Plus, Edit2, Trash2, X, AlertCircle } from 'lucide-react';
+import { fallbackProducts } from '../../data/fallbackProducts';
 
 const AdminProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -26,7 +27,14 @@ const AdminProductsPage = () => {
       const res = await api.get('/products?limit=100');
       setProducts(res.data.products);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch products');
+      // Fallback to local storage or fallback products
+      const stored = localStorage.getItem('catalog_products');
+      if (stored) {
+        setProducts(JSON.parse(stored));
+      } else {
+        setProducts(fallbackProducts);
+        localStorage.setItem('catalog_products', JSON.stringify(fallbackProducts));
+      }
     } finally {
       setLoading(false);
     }
@@ -74,14 +82,35 @@ const AdminProductsPage = () => {
 
     try {
       if (modalMode === 'create') {
-        await api.post('/products', formData);
+        const res = await api.post('/products', formData);
+        setProducts([res.data.product, ...products]);
       } else {
-        await api.put(`/products/${modalMode._id}`, formData);
+        const res = await api.put(`/products/${modalMode._id}`, formData);
+        setProducts(products.map((p) => (p._id === modalMode._id ? res.data.product : p)));
       }
       closeModal();
-      fetchProducts();
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Failed to save product');
+      // Offline / GitHub Pages fallback
+      if (modalMode === 'create') {
+        const newProduct = {
+          _id: 'prod_' + Date.now(),
+          ...formData,
+          price: Number(formData.price),
+          stock: Number(formData.stock),
+        };
+        const updated = [newProduct, ...products];
+        setProducts(updated);
+        localStorage.setItem('catalog_products', JSON.stringify(updated));
+      } else {
+        const updated = products.map((p) =>
+          p._id === modalMode._id
+            ? { ...p, ...formData, price: Number(formData.price), stock: Number(formData.stock) }
+            : p
+        );
+        setProducts(updated);
+        localStorage.setItem('catalog_products', JSON.stringify(updated));
+      }
+      closeModal();
     } finally {
       setSubmitting(false);
     }
@@ -93,7 +122,10 @@ const AdminProductsPage = () => {
         await api.delete(`/products/${id}`);
         setProducts(products.filter((p) => p._id !== id));
       } catch (err) {
-        alert(err.response?.data?.message || 'Failed to delete product');
+        // Fallback
+        const updated = products.filter((p) => p._id !== id);
+        setProducts(updated);
+        localStorage.setItem('catalog_products', JSON.stringify(updated));
       }
     }
   };
@@ -143,6 +175,9 @@ const AdminProductsPage = () => {
                           src={product.imageUrl}
                           alt={product.name}
                           className="w-12 h-12 object-cover rounded-xl bg-gray-100 flex-shrink-0"
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=800&q=80';
+                          }}
                         />
                         <div className="min-w-0">
                           <p className="font-bold text-gray-900 truncate max-w-xs">
@@ -247,7 +282,7 @@ const AdminProductsPage = () => {
                   required
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="e.g. Audio, Laptops, Accessories"
+                  placeholder="e.g. Audio, Computers, Accessories"
                   className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -259,12 +294,12 @@ const AdminProductsPage = () => {
                   </label>
                   <input
                     type="number"
-                    step="0.01"
+                    step="1"
                     min="0"
                     required
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    placeholder="299.99"
+                    placeholder="24990"
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>

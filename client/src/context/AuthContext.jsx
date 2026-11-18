@@ -30,9 +30,34 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', userToken);
       return { success: true, user: userData };
     } catch (err) {
-      const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
-      setError(msg);
-      return { success: false, message: msg };
+      // If deliberate auth error from a reachable backend (400 or 401 with message)
+      if (err.response && (err.response.status === 400 || err.response.status === 401) && err.response.data?.message) {
+        const msg = err.response.data.message;
+        setError(msg);
+        return { success: false, message: msg };
+      }
+
+      // Standalone showcase fallback for GitHub Pages (no live backend)
+      const savedUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+      const matched = savedUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+
+      const isAdminUser = email.toLowerCase().includes('admin') || email.toLowerCase() === 'admin@example.com';
+      const role = isAdminUser ? 'admin' : (matched?.role || 'user');
+      const name = matched?.name || (isAdminUser ? 'Admin User' : email.split('@')[0] || 'Customer');
+
+      const userData = {
+        _id: matched?._id || 'mock_usr_' + Date.now(),
+        name,
+        email,
+        role,
+      };
+      const mockToken = 'mock_jwt_token_' + Date.now();
+
+      setUser(userData);
+      setToken(mockToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', mockToken);
+      return { success: true, user: userData };
     } finally {
       setLoading(false);
     }
@@ -52,9 +77,36 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', userToken);
       return { success: true, user: userData };
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed.';
-      setError(msg);
-      return { success: false, message: msg };
+      // If deliberate error from reachable backend (e.g. email already exists)
+      if (err.response && err.response.status === 400 && err.response.data?.message?.includes('already exists')) {
+        const msg = err.response.data.message;
+        setError(msg);
+        return { success: false, message: msg };
+      }
+
+      // Standalone showcase fallback for GitHub Pages (no live backend)
+      const savedUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+      const role = email.toLowerCase().includes('admin') ? 'admin' : 'user';
+      
+      const userData = {
+        _id: 'mock_usr_' + Date.now(),
+        name: name.trim() || 'New User',
+        email: email.trim().toLowerCase(),
+        role,
+      };
+
+      // Add to registered list if not present
+      if (!savedUsers.some((u) => u.email === userData.email)) {
+        savedUsers.push(userData);
+        localStorage.setItem('registered_users', JSON.stringify(savedUsers));
+      }
+
+      const mockToken = 'mock_jwt_token_' + Date.now();
+      setUser(userData);
+      setToken(mockToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', mockToken);
+      return { success: true, user: userData };
     } finally {
       setLoading(false);
     }

@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useCart } from '../context/CartContext';
 import { ArrowLeft, ShoppingCart, Check, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
-
 import { fallbackProducts } from '../data/fallbackProducts';
 
 const ProductDetailPage = () => {
@@ -25,7 +24,10 @@ const ProductDetailPage = () => {
         const res = await api.get(`/products/${id}`);
         setProduct(res.data.product);
       } catch (err) {
-        const fallback = fallbackProducts.find((p) => p._id === id);
+        // Fallback: check localStorage or fallbackProducts
+        const stored = localStorage.getItem('catalog_products');
+        const catalog = stored ? JSON.parse(stored) : fallbackProducts;
+        const fallback = catalog.find((p) => p._id === id) || fallbackProducts.find((p) => p._id === id);
         if (fallback) {
           setProduct(fallback);
         } else {
