@@ -4,6 +4,8 @@ import api from '../api/axios';
 import { useCart } from '../context/CartContext';
 import { ArrowLeft, ShoppingCart, Check, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 
+import { fallbackProducts } from '../data/fallbackProducts';
+
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,7 +25,12 @@ const ProductDetailPage = () => {
         const res = await api.get(`/products/${id}`);
         setProduct(res.data.product);
       } catch (err) {
-        setError(err.response?.data?.message || 'Product not found');
+        const fallback = fallbackProducts.find((p) => p._id === id);
+        if (fallback) {
+          setProduct(fallback);
+        } else {
+          setError(err.response?.data?.message || 'Product not found');
+        }
       } finally {
         setLoading(false);
       }

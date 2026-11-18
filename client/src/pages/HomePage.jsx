@@ -3,15 +3,16 @@ import api from '../api/axios';
 import ProductCard from '../components/ProductCard';
 import Pagination from '../components/Pagination';
 import { Search, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { fallbackProducts } from '../data/fallbackProducts';
 
 const HomePage = () => {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState(['All']);
+  const [products, setProducts] = useState(fallbackProducts);
+  const [categories, setCategories] = useState(['All', 'Audio', 'Computers', 'Accessories', 'Displays', 'Wearables', 'Cameras', 'Electronics']);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Fetch categories once on mount
@@ -19,11 +20,11 @@ const HomePage = () => {
     const fetchCategories = async () => {
       try {
         const res = await api.get('/products/categories');
-        if (res.data.categories) {
+        if (res.data.categories && res.data.categories.length > 1) {
           setCategories(res.data.categories);
         }
       } catch (err) {
-        console.error('Failed to load categories', err);
+        // Keep fallback categories
       }
     };
     fetchCategories();
@@ -47,16 +48,34 @@ const HomePage = () => {
         }
 
         const res = await api.get('/products', { params });
-        setProducts(res.data.products);
-        setTotalPages(res.data.pages);
+        if (res.data.products && res.data.products.length > 0) {
+          setProducts(res.data.products);
+          setTotalPages(res.data.pages || 1);
+        } else if (searchQuery.trim() || (selectedCategory && selectedCategory !== 'All')) {
+          setProducts([]);
+        } else {
+          setProducts(fallbackProducts);
+        }
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch products');
+        // Fallback for GitHub Pages static showcase mode
+        let filtered = fallbackProducts;
+        if (selectedCategory && selectedCategory !== 'All') {
+          filtered = filtered.filter((p) => p.category === selectedCategory);
+        }
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase().trim();
+          filtered = filtered.filter(
+            (p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
+          );
+        }
+        setProducts(filtered);
+        setTotalPages(Math.ceil(filtered.length / 8) || 1);
       } finally {
         setLoading(false);
       }
     };
 
-    const timer = setTimeout(fetchProducts, 250);
+    const timer = setTimeout(fetchProducts, 150);
     return () => clearTimeout(timer);
   }, [selectedCategory, searchQuery, currentPage]);
 
@@ -83,10 +102,9 @@ const HomePage = () => {
             Elevate Your Everyday Essentials.
           </h1>
           <p className="mt-4 text-indigo-200 text-base sm:text-lg">
-            Shop the latest in audio, laptops, custom mechanical keyboards, and precision accessories with rapid delivery.
+            Shop the latest in audio, laptops, custom mechanical keyboards, and precision accessories in Indian Rupees (₹).
           </p>
         </div>
-        {/* Subtle decorative glow */}
         <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
       </div>
 
@@ -138,11 +156,6 @@ const HomePage = () => {
             </div>
           ))}
         </div>
-      ) : error ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-red-100 p-6">
-          <p className="text-red-600 font-semibold mb-2">Error loading products</p>
-          <p className="text-gray-500 text-sm">{error}</p>
-        </div>
       ) : products.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
           <SlidersHorizontal className="w-12 h-12 text-gray-400 mx-auto mb-3" />
@@ -168,7 +181,6 @@ const HomePage = () => {
             ))}
           </div>
 
-          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

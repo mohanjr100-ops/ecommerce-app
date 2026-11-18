@@ -56,11 +56,43 @@ const CheckoutPage = () => {
         paymentMethod: formData.paymentMethod,
       };
 
-      const res = await api.post('/orders', payload);
+      try {
+        const res = await api.post('/orders', payload);
 
-      if (res.data.success) {
+        if (res.data.success) {
+          clearCart();
+          navigate(`/order-success/${res.data.order._id}`);
+          return;
+        }
+      } catch (err) {
+        // Fallback for GitHub Pages static showcase mode
+        const mockOrderId = '6afd' + Math.random().toString(16).slice(2, 18);
+        const savedOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+        const newOrder = {
+          _id: mockOrderId,
+          createdAt: new Date().toISOString(),
+          status: 'Pending',
+          totalPrice,
+          paymentMethod: formData.paymentMethod,
+          shippingAddress: {
+            fullName: formData.fullName,
+            address: formData.address,
+            city: formData.city,
+            postalCode: formData.postalCode,
+            phone: formData.phone,
+          },
+          orderItems: cartItems.map((item) => ({
+            name: item.name,
+            qty: item.qty,
+            price: item.price,
+            imageUrl: item.imageUrl,
+          })),
+        };
+        savedOrders.unshift(newOrder);
+        localStorage.setItem('my_orders', JSON.stringify(savedOrders));
+
         clearCart();
-        navigate(`/order-success/${res.data.order._id}`);
+        navigate(`/order-success/${mockOrderId}`);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to place order. Please try again.');

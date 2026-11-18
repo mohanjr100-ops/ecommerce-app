@@ -13,9 +13,15 @@ const MyOrdersPage = () => {
       setLoading(true);
       try {
         const res = await api.get('/orders/my');
-        setOrders(res.data.orders);
+        if (res.data.orders && res.data.orders.length > 0) {
+          setOrders(res.data.orders);
+        } else {
+          const localOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+          setOrders(localOrders);
+        }
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load your orders');
+        const localOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+        setOrders(localOrders);
       } finally {
         setLoading(false);
       }
