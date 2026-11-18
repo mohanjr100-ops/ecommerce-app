@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../api/axios';
+import api from '../../api/axios';
 import { DollarSign, ShoppingBag, PackageCheck, Users, ArrowUpRight, TrendingUp } from 'lucide-react';
 
 const AdminDashboardPage = () => {
