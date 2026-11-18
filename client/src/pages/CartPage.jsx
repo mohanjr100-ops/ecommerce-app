@@ -61,7 +61,7 @@ const CartPage = () => {
                     Category: {item.category}
                   </span>
                   <span className="text-sm font-bold text-gray-800 block mt-1">
-                    ${item.price.toFixed(2)} each
+                    ₹{item.price.toLocaleString('en-IN')} each
                   </span>
                 </div>
               </div>
@@ -89,7 +89,7 @@ const CartPage = () => {
 
                 <div className="text-right min-w-[5rem]">
                   <span className="text-lg font-extrabold text-gray-900 block">
-                    ${(item.price * item.qty).toFixed(2)}
+                    ₹{(item.price * item.qty).toLocaleString('en-IN')}
                   </span>
                 </div>
 
@@ -115,7 +115,7 @@ const CartPage = () => {
             <div className="space-y-3 text-sm text-gray-600">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-semibold text-gray-900">${totalPrice.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900">₹{totalPrice.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
@@ -123,14 +123,14 @@ const CartPage = () => {
               </div>
               <div className="flex justify-between">
                 <span>Estimated Tax</span>
-                <span className="font-semibold text-gray-900">$0.00</span>
+                <span className="font-semibold text-gray-900">₹0</span>
               </div>
             </div>
 
             <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
               <span className="text-base font-bold text-gray-900">Total</span>
               <span className="text-2xl font-extrabold text-indigo-600">
-                ${totalPrice.toFixed(2)}
+                ₹{totalPrice.toLocaleString('en-IN')}
               </span>
             </div>
 

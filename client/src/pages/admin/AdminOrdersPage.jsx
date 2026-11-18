@@ -109,7 +109,7 @@ const AdminOrdersPage = () => {
 
                     {/* Total */}
                     <td className="px-6 py-4 font-bold text-gray-900 text-base">
-                      ${order.totalPrice.toFixed(2)}
+                      ₹{order.totalPrice.toLocaleString('en-IN')}
                     </td>
 
                     {/* Current Status Badge */}

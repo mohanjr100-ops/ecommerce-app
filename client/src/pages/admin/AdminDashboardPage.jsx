@@ -79,7 +79,7 @@ const AdminDashboardPage = () => {
               Total Revenue
             </span>
             <span className="text-2xl font-extrabold text-gray-900 mt-1 block">
-              ${stats?.totalRevenue?.toFixed(2) || '0.00'}
+              ₹{stats?.totalRevenue?.toLocaleString('en-IN') || '0'}
             </span>
             <span className="text-xs text-emerald-600 font-semibold flex items-center gap-0.5 mt-2">
               <TrendingUp className="w-3.5 h-3.5" /> Gross sales
@@ -192,7 +192,7 @@ const AdminDashboardPage = () => {
                       {order.orderItems.length} {order.orderItems.length === 1 ? 'item' : 'items'}
                     </td>
                     <td className="px-6 py-4 font-bold text-gray-900">
-                      ${order.totalPrice.toFixed(2)}
+                      ₹{order.totalPrice.toLocaleString('en-IN')}
                     </td>
                     <td className="px-6 py-4">
                       <span

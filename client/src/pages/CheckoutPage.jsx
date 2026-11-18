@@ -226,7 +226,7 @@ const CheckoutPage = () => {
                     <p className="text-xs text-gray-500">Qty: {item.qty}</p>
                   </div>
                   <span className="text-xs font-extrabold text-gray-900">
-                    ${(item.price * item.qty).toFixed(2)}
+                    ₹{(item.price * item.qty).toLocaleString('en-IN')}
                   </span>
                 </div>
               ))}
@@ -235,7 +235,7 @@ const CheckoutPage = () => {
             <div className="pt-4 border-t border-gray-100 space-y-2 text-sm text-gray-600">
               <div className="flex justify-between">
                 <span>Items Subtotal</span>
-                <span className="font-semibold text-gray-900">${totalPrice.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900">₹{totalPrice.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
@@ -243,7 +243,7 @@ const CheckoutPage = () => {
               </div>
               <div className="flex justify-between pt-2 border-t border-gray-100 font-bold text-base text-gray-900">
                 <span>Total Amount</span>
-                <span className="text-xl text-indigo-600">${totalPrice.toFixed(2)}</span>
+                <span className="text-xl text-indigo-600">₹{totalPrice.toLocaleString('en-IN')}</span>
               </div>
             </div>
 

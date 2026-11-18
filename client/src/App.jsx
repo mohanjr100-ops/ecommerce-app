@@ -23,7 +23,7 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
       <Navbar />
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pb-16 md:pb-0">
         <Routes>
           {/* Public Store Routes */}
           <Route path="/" element={<HomePage />} />

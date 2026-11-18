@@ -11,7 +11,7 @@ const sampleProducts = [
   {
     name: 'Sony WH-1000XM5 Wireless Headphones',
     description: 'Industry-leading noise cancellation with two processors and 8 microphones. Up to 30-hour battery life with quick charging.',
-    price: 399.99,
+    price: 24990,
     category: 'Audio',
     imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
     stock: 25,
@@ -19,7 +19,7 @@ const sampleProducts = [
   {
     name: 'Apple MacBook Air M3 (15-inch)',
     description: 'Impossibly thin and fast with Apple M3 chip, 15.3-inch Liquid Retina display, 16GB unified memory, and 512GB SSD storage.',
-    price: 1299.0,
+    price: 114900,
     category: 'Computers',
     imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80',
     stock: 12,
@@ -27,7 +27,7 @@ const sampleProducts = [
   {
     name: 'Logitech MX Master 3S Wireless Mouse',
     description: 'Quiet click precision mouse with 8K DPI any-surface tracking, MagSpeed electromagnetic scrolling, and ergonomic thumb rest.',
-    price: 99.99,
+    price: 8995,
     category: 'Accessories',
     imageUrl: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=800&q=80',
     stock: 45,
@@ -35,7 +35,7 @@ const sampleProducts = [
   {
     name: 'Keychron Q1 Pro Custom Mechanical Keyboard',
     description: '75% layout QMK/VIA wireless custom mechanical keyboard with CNC aluminum body and hot-swappable switches.',
-    price: 199.0,
+    price: 14999,
     category: 'Accessories',
     imageUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80',
     stock: 18,
@@ -43,7 +43,7 @@ const sampleProducts = [
   {
     name: 'Samsung 49-Inch Odyssey G9 Curved Gaming Monitor',
     description: 'Dual QHD 240Hz 1000R curved gaming monitor with Quantum Mini-LED technology and 1ms response time.',
-    price: 1099.99,
+    price: 99999,
     category: 'Displays',
     imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&q=80',
     stock: 8,
@@ -51,7 +51,7 @@ const sampleProducts = [
   {
     name: 'Apple Watch Ultra 2 GPS + Cellular',
     description: 'Rugged 49mm titanium case, precision dual-frequency GPS, up to 36 hours of battery life, and customizable Action button.',
-    price: 799.0,
+    price: 79900,
     category: 'Wearables',
     imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
     stock: 20,
@@ -59,7 +59,7 @@ const sampleProducts = [
   {
     name: 'Bose SoundLink Revolve+ II Bluetooth Speaker',
     description: 'Durable 360-degree portable Bluetooth speaker with deep, immersive sound, water/dust resistance, and built-in handle.',
-    price: 249.0,
+    price: 19900,
     category: 'Audio',
     imageUrl: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800&q=80',
     stock: 30,
@@ -67,7 +67,7 @@ const sampleProducts = [
   {
     name: 'Fujifilm X-T5 Mirrorless Digital Camera',
     description: '40.2MP non-stacked X-Trans 5 HR sensor, 5-axis in-body image stabilization, and dedicated retro dials.',
-    price: 1699.95,
+    price: 149999,
     category: 'Cameras',
     imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80',
     stock: 6,
@@ -75,7 +75,7 @@ const sampleProducts = [
   {
     name: 'Anker 737 Power Bank (PowerCore 24K)',
     description: 'Ultra-powerful 140W fast portable charger with smart digital display and 24,000mAh capacity for laptops and phones.',
-    price: 129.99,
+    price: 9999,
     category: 'Accessories',
     imageUrl: 'https://images.unsplash.com/photo-1609592424109-dd9892f1b177?w=800&q=80',
     stock: 50,
@@ -83,7 +83,7 @@ const sampleProducts = [
   {
     name: 'Kindle Paperwhite Signature Edition (32 GB)',
     description: '6.8-inch display, wireless charging, auto-adjusting front light, and weeks of battery life for immersive reading.',
-    price: 189.99,
+    price: 14999,
     category: 'Electronics',
     imageUrl: 'https://images.unsplash.com/photo-1592496001020-d31bd830651f?w=800&q=80',
     stock: 35,
@@ -116,7 +116,7 @@ const seedDatabase = async () => {
       role: 'user',
     });
 
-    console.log('[Seeder] Seeding 10 sample products...');
+    console.log('[Seeder] Seeding 10 sample products with Rupee (₹) pricing...');
     const createdProducts = await Product.insertMany(sampleProducts);
 
     console.log('\n===========================================');
@@ -124,7 +124,7 @@ const seedDatabase = async () => {
     console.log('===========================================');
     console.log(`- Admin Account:  ${adminUser.email} / admin123  (Role: admin)`);
     console.log(`- User Account:   ${normalUser.email} / user123   (Role: user)`);
-    console.log(`- Products:       ${createdProducts.length} items added to catalog`);
+    console.log(`- Products:       ${createdProducts.length} items added with INR (₹)`);
     console.log('===========================================\n');
 
     process.exit(0);

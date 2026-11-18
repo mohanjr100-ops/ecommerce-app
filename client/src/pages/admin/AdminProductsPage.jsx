@@ -160,7 +160,7 @@ const AdminProductsPage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 font-bold text-gray-900">
-                      ${product.price.toFixed(2)}
+                      ₹{product.price.toLocaleString('en-IN')}
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -255,7 +255,7 @@ const AdminProductsPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    Price ($)
+                    Price (₹)
                   </label>
                   <input
                     type="number"

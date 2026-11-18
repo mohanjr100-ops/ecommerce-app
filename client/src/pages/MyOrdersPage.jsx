@@ -113,7 +113,7 @@ const MyOrdersPage = () => {
                       {order.status}
                     </span>
                     <span className="text-xl font-extrabold text-gray-900">
-                      ${order.totalPrice.toFixed(2)}
+                      ₹{order.totalPrice.toLocaleString('en-IN')}
                     </span>
                   </div>
                 </div>
@@ -199,12 +199,12 @@ const MyOrdersPage = () => {
                         <div>
                           <p className="font-bold text-gray-900 text-sm">{item.name}</p>
                           <p className="text-xs text-gray-500">
-                            Qty: {item.qty} × ${item.price.toFixed(2)}
+                            Qty: {item.qty} × ₹{item.price.toLocaleString('en-IN')}
                           </p>
                         </div>
                       </div>
                       <span className="font-bold text-gray-900 text-sm">
-                        ${(item.qty * item.price).toFixed(2)}
+                        ₹{(item.qty * item.price).toLocaleString('en-IN')}
                       </span>
                     </div>
                   ))}

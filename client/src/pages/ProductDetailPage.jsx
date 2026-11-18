@@ -100,7 +100,7 @@ const ProductDetailPage = () => {
 
             <div className="mt-4 flex items-center gap-4">
               <span className="text-3xl font-extrabold text-gray-900">
-                ${product.price.toFixed(2)}
+                ₹{product.price.toLocaleString('en-IN')}
               </span>
 
               <span

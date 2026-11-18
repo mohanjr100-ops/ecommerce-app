@@ -64,7 +64,7 @@ const ProductCard = ({ product }) => {
           <div>
             <span className="text-xs text-gray-400 block font-medium">Price</span>
             <span className="text-xl font-bold text-gray-900">
-              ${product.price.toFixed(2)}
+              ₹{product.price.toLocaleString('en-IN')}
             </span>
           </div>
 
